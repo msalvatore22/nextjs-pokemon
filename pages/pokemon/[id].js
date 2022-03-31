@@ -8,17 +8,30 @@ import {
   TableRow,
 } from "@mui/material";
 import { withRouter } from "next/router";
-import store from "../../src/store";
+
+
 const PageContainer = styled.div`
   margin: auto;
   width: 800px;
   padding-top: 1em;
 `;
 
-export default withRouter(({ router }) => {
-  const pokemon = store.pokemon.find(
-    ({ id }) => id.toString() === router.query.id
-  );
+export async function getServerSideProps(context) {
+    const allPokemon = await (
+      await fetch("http://localhost:3000/pokemon.json")
+    ).json();
+
+    const pokemon = allPokemon.find(
+        ({ id }) => id.toString() === context.query.id
+      );
+    return {
+      props: {
+        pokemon,
+      }, // will be passed to the page component as props
+    };
+  }
+
+export default withRouter(({ pokemon }) => {
   return (
     <PageContainer>
       <CssBaseline />
